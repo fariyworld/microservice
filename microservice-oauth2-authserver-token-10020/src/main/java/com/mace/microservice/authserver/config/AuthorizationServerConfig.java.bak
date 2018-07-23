@@ -1,0 +1,86 @@
+package com.mace.microservice.authserver.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+
+import java.security.KeyPair;
+
+/**
+ * description:
+ * <br />
+ * Created by mace on 10:53 2018/7/22.
+ */
+@Configuration
+@EnableAuthorizationServer//开启Auth认证服务器
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+
+    /**
+     * description: 配置客户端认证方式以及客户端连接参数设置
+     * <br /><br />
+     * create by mace on 2018/7/23 11:23.
+     * @param clients
+     * @return: void
+     */
+    @Override
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//        super.configure(clients);
+        clients.inMemory()
+                .withClient("android")
+                .scopes("xx") //此处的scopes是无用的，可以随意设置
+                .secret("android")
+                .authorizedGrantTypes("password", "authorization_code", "refresh_token")
+                .and()
+                .withClient("webapp")
+                .scopes("xx")
+                .authorizedGrantTypes("implicit");
+    }
+
+
+    /**
+     * description: 配置oauth认证安全策略 从表单提交经过OAuth认证
+     * <br /><br />
+     * create by mace on 2018/7/23 11:24.
+     * @param security
+     * @return: void
+     */
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+//        super.configure(security);
+        security
+                    .tokenKeyAccess("permitAll()")
+                    .checkTokenAccess("isAuthenticated()")
+                    .allowFormAuthenticationForClients();
+    }
+
+    @Bean
+    public JwtAccessTokenConverter jwtAccessTokenConverter(){
+
+        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        KeyPair keyPair = new KeyStoreKeyFactory(new ClassPathResource("mace.jks"), "liuye0425".toCharArray()).getKeyPair("mace");
+        converter.setKeyPair(keyPair);
+        return converter;
+    }
+
+
+    /**
+     * description: 认证转换器配置
+     * <br /><br />
+     * create by mace on 2018/7/23 11:26.
+     * @param endpoints
+     * @return: void
+     */
+    @Override
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+//        super.configure(endpoints);
+        endpoints.accessTokenConverter(jwtAccessTokenConverter());
+    }
+}

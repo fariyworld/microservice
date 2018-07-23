@@ -1,0 +1,35 @@
+server:
+  port: 81
+
+spring:
+  aop:
+    proxy-target-class: true                      #使用 CGLIB 来实现AOP false:使用的是标准Java的实现。
+  application:
+    name: microservice-consumer-dept-ribbon-hystrix-80
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true                             #重试机制开关,默认false
+
+#客户端注册进eureka服务列表内
+eureka:
+  client:
+    service-url:
+#      defaultZone: http://127.0.0.1:7001/eureka                                      # 单机
+      defaultZone: http://mace:liuye0425@eureka01.com:7001/eureka/,http://mace:liuye0425@eureka02.com:7002/eureka/  # 集群
+  instance:
+    instance-id: microservice-consumer-dept-ribbon-hystrix-80      #自定义服务名称
+    prefer-ip-address: true                                       #访问路径可以显示 IP 地址
+
+info:
+  app.name: $project.artifactId$
+  company.name: www.mace.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+
+ribbon:
+  eager-load:
+    enabled: true                                         #开启Ribbon的饥饿加载模式
+    clients: microservice-provider-dept                    #指定需要饥饿加载的服务名
+
+

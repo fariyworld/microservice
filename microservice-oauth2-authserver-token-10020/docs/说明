@@ -1,0 +1,19 @@
+数据库表字段说明
+http://andaily.com/spring-oauth-server/db_table_description.html
+
+1.Spring5.0 新版本中，有很多的方法和类发生了改变，导致现在网上大多数的认证代码不能使用，运行报错。经过查询与研究。终于运行起来了。需要注意的有：
+  RedisConnectionFactory保存token的时候会出现错误，这个时候需要自定义MyRedisTokenStore类，实现TokenStore。
+  MyRedisTokenStore和RedisTokenStore代码差不多一样，只是把所有conn.set(…)都换成conn..stringCommands().set(…)，
+
+
+2.PasswordEncoder密码验证clientId的时候会报错，因为5.0新特性中需要在密码前方需要加上{Xxx}来判别。
+  所以需要自定义一个类，重新BCryptPasswordEncoder的match方法。
+
+public class MyBCryptPasswordEncoder extends BCryptPasswordEncoder {
+    @Override
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        String presentedPassword =passwordEncoder.encode(encodedPassword);
+        return passwordEncoder.matches(rawPassword, presentedPassword);
+    }
+}

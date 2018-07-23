@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <title>用户首页</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+</head>
+<body>
+    <div th:substituteby="index::logout"></div>
+    <h1>这是个被保护的页面.</h1>
+    <p><a href="/index" th:href="@{/index}">返回首页</a></p>
+</body>
+</html>

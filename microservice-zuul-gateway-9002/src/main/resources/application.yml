@@ -1,0 +1,35 @@
+server:
+  port: 9002
+
+spring:
+  application:
+    name: microservice-zuul
+
+zuul:
+  ignored-services: "*"  #忽略指定服务，多个服务逗号分隔
+  routes:
+    dept-service:                                           #自定义的 路由名称
+      path: /consumer/dept/**                                       #路由路径 http://127.0.0.1:9099/consumer/dept/consumer/dept/findAll.do?accessToken=abc
+      serviceId: microservice-consumer-dept-ribbno-hystrix-80      #如果是/consumer/dept/**路径下的请求，则跳转到 cloud-consumer-dept-ribbon-hystrix-80
+
+
+#客户端注册进eureka服务列表内
+eureka:
+  client:
+    service-url:
+#      defaultZone: http://127.0.0.1:9090/eureka                                      # 单机
+      defaultZone: http://mace:liuye0425@eureka01.com:7001/eureka/,http://mace:liuye0425@eureka02.com:7002/eureka/  # 集群
+  instance:
+    instance-id: microservice-zuul:9002                    #自定义服务名称
+    prefer-ip-address: true                               #访问路径可以显示 IP 地址
+
+info:
+  app.name: $project.artifactId$
+  company.name: www.mace.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
+
+
+
+
+

@@ -1,0 +1,7 @@
+springcloud实现权限控制
+服务注册中心：open-eureka-server，此项目为eureka-server服务器，eureka客户端通过服务名实现ribbon的负载均衡，具体。
+认证中心：open-oauth-server，此项目结合了spring cloud oauth2的认证服务器功能，实现了派发token的作用，
+同时此认证中心纳入到了服务注册中心，实现高可用。
+
+鉴权中心：open-api-gateway ，此项目为业务网关同时也是资源服务器，可以接入各种微服务子项目，
+通过配置AuthorizeConfigProvider实现具体鉴权或放权功能。

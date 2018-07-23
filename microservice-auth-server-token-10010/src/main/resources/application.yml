@@ -1,0 +1,98 @@
+server:
+  port: 10010
+  context-path: /oauth2
+spring:
+  application:
+    name: oauth2-server-10010
+#  数据源
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource            #数据库连接池类型 druid
+    driver-class-name: com.mysql.jdbc.Driver                #mysql 驱动包
+    url: jdbc:mysql://192.168.88.132:3306/auth_server?useUnicode=true&characterEncoding=utf8&characterSetResults=utf8         #数据库名称
+    username: root                                          #用户名
+    password: ENC(Qml0BS/5j8LD9dyKa+Eo/Y4DhmGofWLQ)         #密码（采用 jasypt 加密配置密码 ）
+#    druid连接池配置
+    druid:
+      name: DruidDataSource-auth-server                  #druid 数据源监控名
+      async-init: true                                      #异步初始化连接池
+      async-close-connection-enable: true                   #异步关闭连接
+      initial-size: 1                                       #初始化时建立物理连接的个数。初始化发生在显示调用init方法，或者第一次getConnection时
+      min-idle: 1                                           #最小连接池数量
+      max-active: 3                                         #最大连接池数量
+      max-wait: 60000                                       #获取连接时最大等待时间，单位毫秒。配置了maxWait之后，缺省启用公平锁，并发效率会有所下降，如果需要可以通过配置useUnfairLock属性为true使用非公平锁。
+      pool-prepared-statements: false                       #是否缓存preparedStatement，也就是PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。
+#      max-pool-prepared-statement-per-connection-size: 100 #当开启缓存 preparedStatement 时配置该项
+      test-while-idle: true                                 #建议配置为true，不影响性能，并且保证安全性。申请连接的时候检测，如果空闲时间大于timeBetweenEvictionRunsMillis，执行validationQuery检测连接是否有效。
+      test-on-borrow: false
+      test-on-return: false
+      validation-query: select 1                            #检查数据库连接
+      filters: stat,wall,log4j                              #stat 监控 wall sql注入
+      filter:
+        stat:
+          merge-sql: true
+          slow-sql-millis: 5000
+  aop:
+    proxy-target-class: true                              #使用 CGLIB 来实现AOP false:使用的是标准Java的实现。
+  jpa:
+    show-sql: true
+  thymeleaf:
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+ #redis 数据源配置
+  redis:
+    # Redis服务器地址
+    host: 192.168.88.132
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password: ENC(Qml0BS/5j8LD9dyKa+Eo/Y4DhmGofWLQ)
+    # 连接超时时间（毫秒）
+    timeout: 60000
+    #连接池
+    pool:
+      # 连接池最大连接数（使用负值表示没有限制）
+      max-active: 3
+      # 连接池中的最大空闲连接
+      max-idle: 1
+      # 连接池中的最小空闲连接
+      min-idle: 1
+      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max-wait: 60000
+  session:
+    store-type: redis
+    redis:
+      namespace: microservice-session-redis
+
+
+#客户端注册进eureka服务列表内
+eureka:
+  client:
+    service-url:
+#      defaultZone: http://127.0.0.1:9090/eureka                                        # 单机
+      defaultZone: http://mace:liuye0425@eureka01.com:7001/eureka/,http://mace:liuye0425@eureka02.com:7002/eureka/   # 集群
+  instance:
+    instance-id: oauth2-server-10010                    #自定义服务名称
+    prefer-ip-address: true                          #访问路径可以显示 IP 地址
+    status-page-url-path: /oauth2/info
+
+security:
+  oauth2:
+    resource:
+      filter-order: 3
+    token:
+      store: redis
+
+
+#jasypt加密参数
+jasypt:
+  encryptor:
+    password: aqeaqeaeqaeqraq
+
+info:
+  app.name: $project.artifactId$
+  company.name: www.mace.com
+  build.artifactId: $project.artifactId$
+  build.version: $project.version$
